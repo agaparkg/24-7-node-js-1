@@ -2,16 +2,18 @@
 import express from "express";
 import { users } from "./data.js";
 import axios from "axios";
+import "dotenv/config";
 
 // CommonJS
 // const express = require("express");
+// require("dotenv").config();
 
 // This line creates an instance of the Express application. express() is a
 // function exported by the Express module, and calling it returns a new
 // instance of an Express application. The app variable is then used to
 // configure routes, middleware, and other settings for your web application.
 const app = express();
-const url = "https://63000b629350a1e548e9abfc.mockapi.io/api/v1/students";
+const url = "https://63000b629350a1e548e9abfc.mockapi.io/api/v1/students/";
 
 // This line defines a variable named port that will be used to determine the
 // port on which your server will listen. It uses the logical OR (||) operator
@@ -20,6 +22,7 @@ const url = "https://63000b629350a1e548e9abfc.mockapi.io/api/v1/students";
 const port = process.env.PORT || 8000;
 
 app.get("/", async (req, res) => {
+  //   console.log(process.env);
   //   res.send({
   //     message: "Welcome to Homepage",
   //     total_Users: users.length,
@@ -54,6 +57,53 @@ app.get("/students", async (req, res) => {
     //   total_students: response.data.length,
     //   students: response.data,
     // });
+  } catch (error) {
+    res.status(400).json({
+      message: "Data not found",
+    });
+  }
+});
+
+app.get("/students/:id", async (req, res) => {
+  console.log("req.params", req.params);
+  //   const id = req.params.id
+  const { id } = req.params;
+
+  try {
+    const response = await fetch(url + id);
+
+    const data = await response.json();
+    // const response = await axios.get(url+id);
+
+    res.status(200).json({
+      message: "Student Found",
+      student: data,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "Data not found",
+    });
+  }
+});
+
+app.delete("/students/:id", async (req, res) => {
+  console.log("req.params", req.params);
+  //   const id = req.params.id
+  const { id } = req.params;
+
+  try {
+    const options = {
+      method: "DELETE",
+    };
+    const response = await fetch(url + id, options);
+
+    const data = await response.json();
+    // const response = await axios.get(url+id);
+
+    res.status(200).json({
+      message: "Student has been deleted",
+      deleted_student: data,
+    });
   } catch (error) {
     res.status(400).json({
       message: "Data not found",
